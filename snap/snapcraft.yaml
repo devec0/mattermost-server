@@ -1,0 +1,42 @@
+---
+name: mattermost-server
+base: core18
+version: git
+summary: Snap package for MatterMost, an open-source private Slack-alternative.
+description: |
+    As an alternative to proprietary SaaS messaging,
+    Mattermost brings all your team communication into one place,
+    making it searchable and accessible anywhere.
+
+grade: stable
+confinement: strict
+
+apps:
+  mattermost-server:
+    daemon: simple
+    command: bin/mattermost --config $SNAP_COMMON/config.json server
+    restart-condition: always
+    plugs:
+      - network
+      - network-bind
+  mattermost:
+    command: bin/mattermost --config $SNAP_COMMON/config.json
+
+parts:
+  mattermost-server:
+    plugin: go
+    go-importpath: github.com/mattermost/mattermost-server
+    build-packages:
+      - build-essential
+    source-type: git
+    source: .
+  mattermost-data:
+    plugin: dump
+    source-type: git
+    source: .
+    prime:
+      - config
+      - fonts
+      - i18n
+      - scripts
+      - templates
